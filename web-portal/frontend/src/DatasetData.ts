@@ -29,11 +29,14 @@ export const mapDatasetDataFromServer = (
 });
 
 export const getDatasets = async (): Promise<DatasetData[]> => {
-  //  const accessToken = await getAccessToken();
+    console.log('Inside getDatasets');
+    const accessToken = await getAccessToken();
+    console.log('After getAccessToken.  The returned value is ' + accessToken);
     const result = await http<DatasetDataFromServer[]>({
         path: '/datasets',
-     //   accessToken: accessToken
+        accessToken: accessToken
     });
+    console.log('After call to /datasets');
     if (result.ok && result.body) {
         return result.body.map(mapDatasetDataFromServer);
     } else {

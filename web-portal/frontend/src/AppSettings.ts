@@ -9,9 +9,10 @@ export const server =
 export const webAPIUrl = 'http://localhost:8080';
 
 export const authSettings = {
-  domain: '[DOMAIN GOES HERE]',
-  client_id: '[CLIENT ID GOES HERE]',
+  domain: 'bobjac.auth0.com',
+  client_id: 'W9tVSOmiQX2qN1oR6RkTpd0jjN5YZHbL',
   redirect_uri: window.location.origin + '/signin-callback',
   scope: 'read:datasets',
-  audience: '[AUDIENCE GOES HERE]',
+ // audience: 'https://quickstarts/api',
+  audience: 'https://qanda',
 };
