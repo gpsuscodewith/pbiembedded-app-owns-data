@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
+import { BrowserRouter, Routes, Route} from "react-router-dom";
 import logo from './logo.svg';
 import { Header } from './Header';
 import { HomePage } from './HomePage';
@@ -25,15 +25,21 @@ const App: React.FC = () => {
       `}
       >
         <Header />
-        <Switch>
-          <Redirect from="/home" to="/" />
-          <Route exact path="/" component={HomePage} />
-          <Route path="/signin" render={() => <SignInPage action="signin" />} />
-          <Route path="/signin-callback" render={() => <SignInPage action="signin-callback" />} />
-          <Route path="/signout" render={() => <SignOutPage action="signout" />} />
-          <Route path="/signout-callback" render={() => <SignOutPage action="signout-callback" />} />
-          <Route component={NotFoundPage} />
-        </Switch>
+        <Routes>
+          <Route path="" element={<HomePage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="signin" element={<SignInPage action="signin" />} />
+          <Route
+            path="/signin-callback"
+            element={<SignInPage action="signin-callback" />}
+          />
+          <Route path="signout" element={<SignOutPage action="signout" />} />
+          <Route
+            path="/signout-callback"
+            element={<SignOutPage action="signout-callback" />}
+          />
+           <Route path="*" element={<NotFoundPage />} />
+        </Routes>
       </div>    
   </BrowserRouter>
   </AuthProvider>

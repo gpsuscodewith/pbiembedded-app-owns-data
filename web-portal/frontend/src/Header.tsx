@@ -1,10 +1,15 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx, css } from "@emotion/react";
-import { fontFamily, fontSize, gray1, gray2, gray5 } from './Styles';
+/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react';
+import React from 'react';
 import { UserIcon } from './Icons';
-import { Link } from "react-router-dom";
 
+import { fontFamily, fontSize, gray1, gray2, gray5 } from './Styles';
+
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+
+import { useForm } from 'react-hook-form';
+
+import { useAuth } from './Auth';
 export const Header = () => (
     <div
         css={css`
