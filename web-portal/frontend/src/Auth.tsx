@@ -61,6 +61,7 @@ export const AuthProvider: FC = ({ children }) => {
   }, []);
 
   const getAuth0ClientFromState = () => {
+    console.log('Inside getAuth0ClientFromState')
     if (auth0Client === undefined) {
       throw new Error('Auth0 client not set');
     }
