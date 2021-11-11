@@ -32,8 +32,11 @@ export const AuthProvider: FC = ({ children }) => {
   useEffect(() => {
     const initAuth0 = async () => {
       setLoading(true);
+      console.log('Inside AuthProvider useEffect() function');
       const auth0FromHook = await createAuth0Client(authSettings);
+      console.log('The value returned from createAuth0Client is' + auth0FromHook);
       setAuth0Client(auth0FromHook);
+      console.log('After setAuth0Client');
 
       if (
         window.location.pathname === '/signin-callback' &&
@@ -58,6 +61,7 @@ export const AuthProvider: FC = ({ children }) => {
   }, []);
 
   const getAuth0ClientFromState = () => {
+    console.log('Inside getAuth0ClientFromState')
     if (auth0Client === undefined) {
       throw new Error('Auth0 client not set');
     }
@@ -83,7 +87,26 @@ export const AuthProvider: FC = ({ children }) => {
   );
 };
 
+export const getAccessToken = async () => {
+  console.log('Inside getAccessToken');
+  const auth0FromHook = await createAuth0Client(authSettings);
+  console.log('After call to auth0FromHook');
+  let accessToken = '';
+  try {
+    accessToken = await auth0FromHook.getTokenSilently();
+  } catch (e) { 
+    if (e.error === 'login_required') {
+        auth0FromHook.loginWithRedirect();
+    }
+    if (e.error === 'consent_required') {
+        auth0FromHook.loginWithRedirect();
+    }
+          throw e;
+  }
+  return accessToken;
+};
 
+/*
 export const getAccessToken = async () => {
   console.log('Inside getAccessToken');
   const auth0FromHook = await createAuth0Client(authSettings);
@@ -109,4 +132,5 @@ export const getAccessToken = async () => {
   
   return accessToken;
 };
+*/
 

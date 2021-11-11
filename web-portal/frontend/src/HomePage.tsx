@@ -1,16 +1,16 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx, css } from "@emotion/react";
+/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react';
 import { useEffect, useState, FC } from "react";
 import { PrimaryButton } from './Styles';
 import { DatasetList } from "./Datasets";
 import { getDatasets, DatasetData } from "./DatasetData"
 import { Page } from "./Page";
 import { PageTitle } from "./PageTitle";
-import { RouteComponentProps } from "react-router-dom";
+//import { RouteComponentProps } from "react-router-dom";
 import { useAuth } from "./Auth";
+import { useNavigate } from 'react-router';
 
-export const HomePage: FC<RouteComponentProps> = ({ history }) => {
+export const HomePage = () => {
     const [dataSets, setDataSets] = useState<DatasetData[]>([]);
     const [dataSetsLoading, setDatasetsLoading] = useState(true);
     
@@ -27,8 +27,9 @@ export const HomePage: FC<RouteComponentProps> = ({ history }) => {
         doGetDatasets();
     }, []);
     console.log('rendered');
+    const navigate = useNavigate();
     const handleImportClick = () => {
-        history.push('/import');
+        navigate('import');
     };
     const { isAuthenticated } = useAuth();
     console.log('The value of isAuthenticatd is ' + isAuthenticated);
