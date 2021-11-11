@@ -4,7 +4,7 @@ import { FC } from "react";
 import { jsx, css } from "@emotion/react";
 import { gray5, accent2 } from './Styles';
 import { User } from "./User";
-import { UserData } from "./Models/User";
+import { UserData } from "./Data/User";
 
 interface Props {
     data: UserData[];

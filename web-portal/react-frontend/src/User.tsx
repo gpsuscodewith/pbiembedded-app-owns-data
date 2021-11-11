@@ -3,7 +3,7 @@ import { FC } from "react";
 /** @jsx jsx */
 import { jsx, css } from "@emotion/react";
 import { gray2, gray3 } from './Styles';
-import { UserData } from './Models/User';
+import { UserData } from './Data/User';
 
 interface Props {
     data: UserData;

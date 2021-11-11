@@ -14,6 +14,8 @@ function App() {
       <Routes>
         <Route path="" element={ <NavTabs />} />
         <Route path="/" element={ <NavTabs />} />
+        <Route path="/signin-callback" element={ <NavTabs />} />
+        <Route path="/users" element={ <NavTabs />} />
       </Routes>
       
     </BrowserRouter>

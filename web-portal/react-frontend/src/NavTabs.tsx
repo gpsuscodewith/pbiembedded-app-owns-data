@@ -8,14 +8,17 @@ export const NavTabs = () => {
 
     const handleChange = (event: any, newValue: React.SetStateAction<number>) => {
         setValue(newValue);
+
     };
 
+    // Review tab types at 
+    // https://mui.com/components/tabs/
     return (
         <Box sx={{ width: '100%' }}>
             <Tabs value={value} onChange={handleChange} aria-label="nav tabs example">
                 <LinkTab label="Users" href="/users" />
-                <LinkTab label="Page Two" href="/two" />
-                <LinkTab label="Page Three" href="/three" />
+                <LinkTab label="Tenants" href="/tenants" />
+                <LinkTab label="Workspaces" href="/workspaces" />
             </Tabs>
         </Box>
     );
