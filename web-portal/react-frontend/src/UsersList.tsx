@@ -1,16 +1,17 @@
+/** @jsxImportSource @emotion/react */
+import { css } from "@emotion/react";
 import { FC } from "react";
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx, css } from "@emotion/react";
 import { gray5, accent2 } from './Styles';
 import { User } from "./User";
 import { UserData } from "./Data/User";
+import { Button } from "@mui/material";
 
 interface Props {
     data: UserData[];
 }
 
 export const UserList: FC<Props> = ({data}) => (    
+    <div>
     <ul
     css={css`
     list-style: none;
@@ -37,5 +38,6 @@ export const UserList: FC<Props> = ({data}) => (
     </li>
     ))}
 </ul>
+</div>
 );
 

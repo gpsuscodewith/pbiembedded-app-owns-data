@@ -11,6 +11,7 @@ ReactDOM.render(
       domain="bobjac.auth0.com"
       clientId="W9tVSOmiQX2qN1oR6RkTpd0jjN5YZHbL"
       redirectUri={window.location.origin + '/signin-callback'}
+      audience="https://qanda"
       //redirectUri={window.location.origin}
       >
       <App />
