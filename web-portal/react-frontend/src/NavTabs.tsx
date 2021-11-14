@@ -50,19 +50,19 @@ export const NavTabs = () => {
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-          <Tab label="Users" {...a11yProps(0)} />
-          <Tab label="Item Two" {...a11yProps(1)} />
-          <Tab label="Item Three" {...a11yProps(2)} />
+          <Tab label="Tenants" {...a11yProps(0)} />
+          <Tab label="Workspaces" {...a11yProps(1)} />
+          <Tab label="Users" {...a11yProps(2)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        <UsersPage />
+        Tenants
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Item Two
+        Workspaces
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Item Three
+        <UsersPage />
       </TabPanel>
     </Box>
     );
