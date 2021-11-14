@@ -30,11 +30,11 @@ export const TenantsPage = () => {
 
     const addTenant = () => {
         setCreatingNewtenant(true);
-    }
+    };
 
     const tenantAdded = (tenant: TenantData) => {
         setCreatingNewtenant(false);
-    }
+    };
 
     return (
         <div>

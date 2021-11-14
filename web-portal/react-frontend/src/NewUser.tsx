@@ -30,7 +30,7 @@ export const NewUserForm = ({userCreated}: Props) => {
                 firstName: firstName,
                 email: email
             };
-            //let returnedUser = doPostUser(userData);
+            
             const token = await getAccessTokenSilently();
             const result = await postUser(token, userData);
             if (result !== undefined) {
