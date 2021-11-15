@@ -53,7 +53,7 @@ export const UsersPage = () => {
                 <NewUserForm userCreated={(user) => userAdded(user)} />
             ) : (
                 <div>
-                    <UserGrid data={users || []} />
+                    <UserGrid data={users || []} onManageUser={(id:string) => alert(`The id of ${id} was successull passed from the UsersGrid`)}/>
                     <div>
                         <BootstrapButton variant="contained" color="primary" onClick={ () => { addUser(); } }>Add User</BootstrapButton>
                     </div>
