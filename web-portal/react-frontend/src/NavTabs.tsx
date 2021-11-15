@@ -4,6 +4,8 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import Tab from '@mui/material/Tab';
 import { UsersPage } from './UsersPage';
+import { TenantsPage } from './TenantsPage';
+import { WorkspacePage } from './WorkspacePage';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -56,10 +58,10 @@ export const NavTabs = () => {
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        Tenants
+        <TenantsPage />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Workspaces
+        <WorkspacePage />
       </TabPanel>
       <TabPanel value={value} index={2}>
         <UsersPage />
