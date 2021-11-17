@@ -25,7 +25,7 @@ export const Header = () => {
         return (
         <div>
             <div>
-            Hello {user && user.name}{' '}
+            Hello {user && user.name }{'| '}{user?.sub}{' '}
             <button onClick={() => logout({ returnTo: window.location.origin + '/signout-callback'})}>
                 Log out
             </button>

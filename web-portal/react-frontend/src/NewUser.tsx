@@ -12,15 +12,23 @@ interface Props {
 }
 
 export const NewUserForm = ({userCreated}: Props) => {
+    const {
+        isLoading,
+        isAuthenticated,
+        error,
+        user,
+        loginWithRedirect,
+        logout,
+        getAccessTokenSilently
+      } = useAuth0();
+
     const [message, setMessage] = React.useState("");
 
     const [userId, setUserId] = React.useState("");
     const [lastName, setLastName] = React.useState("");
     const [firstName, setFirstName] = React.useState("");
     const [email, setEmail] = React.useState("");
-
-    const { getAccessTokenSilently } = useAuth0();
-
+    
     const createUser = async () => {
         try {
             let userData: UserData = {

@@ -26,12 +26,10 @@ const mapUserDataFromServer = (
 
 
 export const getUsers = async(accessToken: string): Promise<UserData[]> => {
-    console.log('Inside getUsers with an accessToken of ' + accessToken);
     const result = await http<UserDataFromServer[]>({
         path: '/users',
         accessToken: accessToken
     });
-    console.log('After call to /users');
     if (result.ok && result.body) {
         return result.body.map(mapUserDataFromServer);
     } else {
@@ -39,11 +37,37 @@ export const getUsers = async(accessToken: string): Promise<UserData[]> => {
     }
 };
 
+export const getUser = async(accessToken: string, id: number): Promise<UserData | undefined> => {
+    console.log(`Inside getUser with an accessToken of ${accessToken} and an id of ${id}`);
+    const result = await http<UserDataFromServer>({
+        path: `/users/${id}`,
+        accessToken: accessToken
+    });
+    if (result.ok && result.body) {
+        return mapUserDataFromServer(result.body);
+    } else {
+        return undefined;
+    }
+};
+
 export const postUser = async(accessToken: string, user: UserData): Promise<UserData | undefined> => {
-    console.log('Inside postUser with an accessToken of ' + accessToken);
     const result = await http<UserDataFromServer, UserData>({
         path: '/users',
         method: 'post',
+        body: user,
+        accessToken: accessToken
+    });
+    if (result.ok && result.body) {
+        return mapUserDataFromServer(result.body);
+    } else {
+        return undefined;
+    }
+};
+
+export const putUser = async(accessToken: string, user: UserData): Promise<UserData | undefined> => {
+    const result = await http<UserDataFromServer, UserData>({
+        path: `/users/${user.id}`,
+        method: 'put',
         body: user,
         accessToken: accessToken
     });
