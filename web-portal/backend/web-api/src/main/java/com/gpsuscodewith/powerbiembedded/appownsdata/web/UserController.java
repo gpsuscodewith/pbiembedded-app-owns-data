@@ -7,15 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.security.*;
 import java.util.stream.Collectors;
 
 @CrossOrigin(maxAge = 3600)
@@ -51,6 +45,41 @@ public class UserController {
     public User getUserByPrincipal(Principal principal) {
         String principalName = principal.getName();
         return getUserByIdpName(principalName);
+    }
+
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable Long userId, Principal principal) {
+        logger.info("Inside getUserById with a userId of " + userId);
+
+        User adminUser = getUserByPrincipal(principal);
+        logger.info("Got the adminUser back with a value of "
+                + adminUser.getId() + "/"
+                + adminUser.getUserId() + "/"
+                + adminUser.getEmail());
+
+        if (!isAdmin(adminUser)) {
+          throw new SecurityException("The user attempting to perform this action is not an admin.");
+        }
+
+        User foundUser = userRepository
+                .findAll()
+                .stream()
+                .filter(x -> x.getId() == userId)
+                .findFirst()
+                .orElse(null);
+
+        if (foundUser != null) {
+            logger.info("Found the user");
+        } else {
+            logger.info("Did NOT find the user");
+        }
+
+        return foundUser;
+    }
+
+    private boolean isAdmin(User user) {
+        // TODO: delegate to a utility function.  Hard code for now
+        return true;
     }
 
     public User getUserByIdpName(String idpName) {
@@ -137,6 +166,18 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody User user, Principal principal) {
         String emailAddress = user.getEmail();
+        return userRepository.save(user);
+    }
+
+    @PutMapping("/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public User updateUser(@PathVariable Long userId, @RequestBody User user, Principal principal) {
+        String principalName = principal.getName();
+        User principalUser = findUser(principal);
+        if (!isAdmin(principalUser)) {
+            throw new SecurityException("Only an admin can perform this operation");
+        }
+
         return userRepository.save(user);
     }
 }

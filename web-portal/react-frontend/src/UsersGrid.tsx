@@ -10,7 +10,7 @@ import { Link } from "@material-ui/core";
 
 interface Props {
     data: UserData[];
-    onManageUser?: (id: string) => void;
+    onManageUser?: (id: number) => void;
 }
 
 export const UserGrid: FC<Props> = ({data, onManageUser}) => {
@@ -63,12 +63,10 @@ export const UserGrid: FC<Props> = ({data, onManageUser}) => {
                     const id: string = thisRow['id'] != null ? thisRow['id'].toString() : '';
                     if (id.length > 0) {
                         console.log(`The value of the id for the user is ${id}`);
+                        if (onManageUser !== undefined) {
+                            onManageUser(parseInt(id));
+                        }
                     }
-                   // return alert(JSON.stringify(thisRow, null, 4));
-    
-                   if (onManageUser !== undefined) {
-                       onManageUser(id);
-                   }
                 };
     
                 return <Link onClick={onClick} underline="always">Manage</Link>;
