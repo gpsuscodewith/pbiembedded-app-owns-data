@@ -12,8 +12,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 
 @CrossOrigin(maxAge = 3600)
@@ -30,6 +32,15 @@ public class PbiWorkspaceUserController {
     @GetMapping
     public Iterable<PbiWorkspaceUser> getPbiWorkspaceUsers() {
         return pbiWorkspaceUserRepository.findAll();
+    }
+
+    @GetMapping("{workspaceId}")
+    public Iterable<PbiWorkspaceUser> getUsersForWorkspace(@PathVariable Long workspaceId) {
+        return pbiWorkspaceUserRepository
+                .findAll()
+                .stream()
+                .filter(workspaceUser -> workspaceUser.getWorkspaceId() == workspaceId)
+                .collect(Collectors.toList());
     }
 
     @PostMapping

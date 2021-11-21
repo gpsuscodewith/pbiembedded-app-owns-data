@@ -93,10 +93,26 @@ public class UserController {
 
     @GetMapping("/{userId}/datasets")
     public Iterable<Dataset> getAvailableDatasets(@PathVariable Long userId, Principal principal) {
+        List<Long> userWorkspaces = getUserWorkspaceIds(userId);
+        return getDatasetsByWorkspaces(userWorkspaces);
+    }
+
+    @GetMapping("{userId}/workspaces")
+    public Iterable<PbiWorkspaceUser> getUserWorkspaces(@PathVariable Long userId, Principal principal) {
         String principalName = principal.getName();
         User user = findUser(principal);
-        List<Long> userWorkspaces = getUserWorkspaces(user.getId());
-        return getDatasetsByWorkspaces(userWorkspaces);
+        if (!isAdmin(user)) {
+            throw new SecurityException("The user must be an admin to perform this action");
+        }
+        return getWorkspacesForUser(userId);
+    }
+
+    private Iterable<PbiWorkspaceUser> getWorkspacesForUser(Long userId) {
+        return pbiWorkspaceUserRepository
+                .findAll()
+                .stream()
+                .filter(workspaceUser -> workspaceUser.getUserId() == userId)
+                .collect(Collectors.toList());
     }
 
     private List<Dataset> getDatasetsByWorkspaces(List<Long> workspaceIds) {
@@ -111,15 +127,9 @@ public class UserController {
         return filteredDatasets;
     }
 
-    private List<Long> getUserWorkspaces(Long userId) {
-        List<PbiWorkspaceUser> workspaceUsers = pbiWorkspaceUserRepository
-                .findAll()
-                .stream()
-                .filter(workspaceUser -> workspaceUser.getUserId() == userId)
-                .collect(Collectors.toList());
-
+    private List<Long> getUserWorkspaceIds(Long userId) {
         ArrayList<Long> workspaceIds = new ArrayList<Long>();
-        for(PbiWorkspaceUser pbiWorkspaceUser : workspaceUsers) {
+        for(PbiWorkspaceUser pbiWorkspaceUser : getWorkspacesForUser(userId)) {
             workspaceIds.add(pbiWorkspaceUser.getWorkspaceId());
         }
         return workspaceIds;

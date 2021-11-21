@@ -6,8 +6,6 @@ import Button from "@mui/material/Button";
 import { BootstrapButton } from "./BootstrapButton";
 import { Link } from "@material-ui/core";
 
-
-
 interface Props {
     data: UserData[];
     onManageUser?: (id: number) => void;
