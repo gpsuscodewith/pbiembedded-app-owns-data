@@ -7,8 +7,9 @@ import { UserData, getUser, putUser } from './Data/User';
 import { Button } from "@material-ui/core";
 import { http } from './Data/http';
 import { WorkspaceData, getWorkspaces } from './Data/Workspace';
-import { WorkspaceUserData } from './Data/WorkspaceUser';
+import { WorkspaceUserData, getWorkspacesForUser } from './Data/WorkspaceUser';
 import { WorkspaceGrid } from "./WorkspaceGrid";
+import { UserGroups } from './UserGroups';
 
 interface Props {
     ID: number;
@@ -37,6 +38,9 @@ export const ManageUser = ({ID}: Props) => {
     const [firstName, setFirstName] = React.useState("");
     const [email, setEmail] = React.useState("");
 
+    const [addedWorkgroups, setAddedWorkgroups] = React.useState<number[]>([]);
+    const [removedWorkgroups, setRemovedWorkgroups] = React.useState<number[]>([]);
+
     useEffect(() => {
         const doGetWorkspaces = async() => {
             const accessToken = await getAccessTokenSilently();
@@ -46,6 +50,8 @@ export const ManageUser = ({ID}: Props) => {
 
         const doGetUserWorkspaces = async() => {
           const accessToken = await getAccessTokenSilently();
+          const userWorkspaces = await getWorkspacesForUser(accessToken, id);
+          setUserWorkspaces(userWorkspaces);
         };
 
         const doGetUser = async(id: number) => {
@@ -91,6 +97,57 @@ export const ManageUser = ({ID}: Props) => {
       }      
     };
 
+    const updateUserGroups = async () => {
+      
+    };
+
+    const assembleWorkspacesForUser = (): WorkspaceData[] => {
+      return workspaces.filter(x => userWorkspaces.some(e => e.workspaceId === x.id));
+    };
+
+    const assembleUser = (): UserData => {
+      let assembledUser: UserData = {
+        id: id,
+        userId: userId,
+        lastName: lastName,
+        firstName: firstName,
+        email: email
+      };
+      return assembledUser;
+    };
+
+    const handleAddWorkspace = (id: number) => {
+      const addedIndex = addedWorkgroups.indexOf(id);
+      if (addedIndex === -1) {
+        const newAddWorkgroups = [...addedWorkgroups];
+        newAddWorkgroups.push(id);
+        setAddedWorkgroups(newAddWorkgroups);
+      }
+
+      const removedIndex = removedWorkgroups.indexOf(id);
+      if (removedIndex !== -1) {
+        const newRemovedWorkgroups = [...removedWorkgroups];
+        newRemovedWorkgroups.splice(removedIndex, 1);
+        setRemovedWorkgroups(newRemovedWorkgroups);
+      }
+    };
+
+    const handleRemoveWorkspace = (id: number) => {
+      const removedIndex = removedWorkgroups.indexOf(id);
+      if (removedIndex === -1) {
+        const newRemovedWorkgroups = [...removedWorkgroups];
+        newRemovedWorkgroups.push(id);
+        setRemovedWorkgroups(newRemovedWorkgroups);
+      }
+
+      const addedIndex = addedWorkgroups.indexOf(id);
+      if (addedIndex !== -1) {
+        const newAddedWorkgroups = [...addedWorkgroups];
+        newAddedWorkgroups.splice(addedIndex, 1);
+        setAddedWorkgroups(newAddedWorkgroups);
+      }
+    };
+
     return (
         <div>
           <Box
@@ -110,10 +167,23 @@ export const ManageUser = ({ID}: Props) => {
             <TextField id="email" onChange={(event) => setEmail(event.target.value)} 
                 label="Email" variant="outlined" value={email}  />
           </Box>
-          <Box>
+    {/*    <Box>
+            Workspaces
             <WorkspaceGrid data={workspaces || []} />
-          </Box>
-        <Button variant="contained" onClick={ () => { updateUser(); } }>Submit</Button>
+    </Box> */}
+          
+          <div>{firstName}'s Workspaces</div>
+          <div>
+       {/*     <WorkspaceGrid data={ assembleWorkspacesForUser() } /> */}
+            <UserGroups 
+              user={assembleUser()} 
+              workspaces={workspaces} 
+              userWorkspaces={userWorkspaces} 
+              addWorkspace={(id) => handleAddWorkspace(id)} 
+              removeWorkspace={(id) => handleRemoveWorkspace(id)}></UserGroups>
+          </div>
+          
+          <Button variant="contained" onClick={ () => { updateUser(); } }>Submit</Button>
       </div>
     );
 };
