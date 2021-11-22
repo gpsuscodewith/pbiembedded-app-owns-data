@@ -4,6 +4,7 @@ import com.gpsuscodewith.powerbiembedded.appownsdata.domain.*;
 import com.gpsuscodewith.powerbiembedded.appownsdata.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -107,6 +108,33 @@ public class UserController {
         return getWorkspacesForUser(userId);
     }
 
+    @DeleteMapping("{userId/workspaces/{workspaceId}")
+    public Iterable<PbiWorkspaceUser> deleteWorkspaceForUser(
+            @PathVariable Long userId,
+            @PathVariable Long workspaceId) {
+
+        List<PbiWorkspaceUser> workspaceUsers =
+                pbiWorkspaceUserRepository
+                        .findAll()
+                        .stream()
+                        .filter(workspaceUser -> workspaceUser.getUserId() == userId && workspaceUser.getWorkspaceId() == workspaceId)
+                        .collect(Collectors.toList());
+
+        if (workspaceUsers.size() == 0) {
+            throw new InvalidDataAccessApiUsageException("There were no WorkspaceUser resources with a userId of "
+                    + userId + " and a workspaceId of " + workspaceId);
+        }
+
+        if (workspaceUsers.size() > 1) {
+            throw new InvalidDataAccessApiUsageException("There was more than 1 WorkspaceUser resource with a userId of "
+                    + userId + " and a workspaceId of " + workspaceId);
+        }
+
+        PbiWorkspaceUser workspaceUser = workspaceUsers.get(0);
+        pbiWorkspaceUserRepository.delete(workspaceUser);
+        return pbiWorkspaceUserRepository.findAll();
+    }
+
     private Iterable<PbiWorkspaceUser> getWorkspacesForUser(Long userId) {
         return pbiWorkspaceUserRepository
                 .findAll()
@@ -172,12 +200,29 @@ public class UserController {
         }
     }
 
+    @PostMapping("/{userId}/workspaces/{workspaceId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public PbiWorkspaceUser createWorkspaceUser(
+            @PathVariable Long userId,
+            @PathVariable Long workspaceId,
+            @RequestBody PbiWorkspaceUser workspaceUser,
+            Principal principal) {
+        String principalName = principal.getName();
+        User principalUser = findUser(principal);
+        if (!isAdmin(principalUser)) {
+            throw new SecurityException("Only an admin can perform this operation");
+        }
+
+        return pbiWorkspaceUserRepository.save(workspaceUser);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody User user, Principal principal) {
         String emailAddress = user.getEmail();
         return userRepository.save(user);
     }
+
 
     @PutMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
