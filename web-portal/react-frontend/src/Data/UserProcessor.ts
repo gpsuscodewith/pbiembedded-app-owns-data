@@ -1,7 +1,7 @@
 import { ProcessorResult, UnitOfWork } from "./UnitOfWork";
 import { UserData,putUser } from "./User";
-import { deleteWorkspaceUser, postWorkspaceForUser } from "./WorkspaceUser";
-
+import { WorkspaceData } from "./Workspace";
+import { deleteWorkspaceUser, postWorkspaceUser, WorkspaceUserData } from "./WorkspaceUser";
 
 export const processUserWorkspaceUpdates = async (
     accessToken: string,
@@ -20,8 +20,13 @@ export const processUserWorkspaceUpdates = async (
     }
 
     for (var j of userGroups.adds) {
-        const innerResult = await postWorkspaceForUser(accessToken, userId, j);
-        if (!innerResult.successful) {
+        const workspaceUser: WorkspaceUserData = {
+            id: 0,
+            userId: userId,
+            workspaceId: j
+        };
+        const innerResult = await postWorkspaceUser(accessToken, workspaceUser);
+        if (innerResult === undefined) {
             processorResult.isSuccessful = false;
         }
     }

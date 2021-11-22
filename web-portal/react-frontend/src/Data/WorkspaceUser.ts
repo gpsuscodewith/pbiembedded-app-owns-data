@@ -59,23 +59,21 @@ export const getWorkspacesForUser = async(accessToken: string, userId: number): 
     }
 };
 
-export const postWorkspaceForUser = async(
+export const postWorkspaceUser = async(
     accessToken: string, 
-    userId: number, 
-    workspaceId: number): Promise<WorkspaceUserPostResult> => {
+    workspaceUser: WorkspaceUserData): Promise<WorkspaceUserData | undefined> => {
     
-    const result = await http<WorkspaceUserPostResultFromServer>({
-        path: `/users/${userId}/workspaces/${workspaceId}`,
+    const result = await http<WorkspaceUserDataFromServer, WorkspaceUserData>({
+        path: `/workspaceusers`,
+        body: workspaceUser,
+        method: 'post',
         accessToken: accessToken,
-        method: 'POST'
     });
 
     if (result.ok && result.body) {
-        return mapWorkspaceUserPostResultFromServer(result.body);
+        return mapWorkspaceUserDataFromServer(result.body);
     } else {
-        return {
-            successful: false
-        };
+        return undefined;
     }
 };
 
