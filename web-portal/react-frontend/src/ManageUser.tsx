@@ -10,6 +10,8 @@ import { WorkspaceData, getWorkspaces } from './Data/Workspace';
 import { WorkspaceUserData, getWorkspacesForUser } from './Data/WorkspaceUser';
 import { WorkspaceGrid } from "./WorkspaceGrid";
 import { UserGroups } from './UserGroups';
+import { processUserWorkspaceUpdates } from './Data/UserProcessor';
+import { UnitOfWork } from "./Data/UnitOfWork";
 
 interface Props {
     ID: number;
@@ -80,29 +82,39 @@ export const ManageUser = ({ID}: Props) => {
 
     const updateUser = async () => {
       const accessToken = await getAccessTokenSilently();
-      let user: UserData = {
-        id: id,
-        userId: userId,
-        lastName: lastName,
-        firstName: firstName,
-        email: email
-      };
+      const user = assembleUser();
       const result = await putUser(accessToken, user);
+      
       if (result !== undefined) {
-        setId(result.id);
-        setUserId(result.userId);
-        setLastName(result.lastName);
-        setFirstName(result.firstName);
-        setEmail(result.email);
-      }      
+        saveUserState(user);
+      }
+      
+      await updateUserGroups();
     };
 
     const updateUserGroups = async () => {
-      
+      const accessToken = await getAccessTokenSilently();
+      const uow: UnitOfWork<number> = {
+        adds: addedWorkgroups,
+        deletes: removedWorkgroups
+      };
+
+      const processorResults = await processUserWorkspaceUpdates(accessToken, id, uow);
+      if (processorResults.isSuccessful) {
+        console.log(`The call to processUserWorkspaceUpdates was unsuccessful with an error message of ${processorResults.errorMessage}`);
+      }
     };
 
     const assembleWorkspacesForUser = (): WorkspaceData[] => {
       return workspaces.filter(x => userWorkspaces.some(e => e.workspaceId === x.id));
+    };
+
+    const saveUserState = (user: UserData) => {
+        setId(user.id);
+        setUserId(user.userId);
+        setLastName(user.lastName);
+        setFirstName(user.firstName);
+        setEmail(user.email);
     };
 
     const assembleUser = (): UserData => {
