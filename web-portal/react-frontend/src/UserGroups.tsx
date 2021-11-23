@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import * as React from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -24,9 +24,25 @@ interface Props {
 export const UserGroups: FC<Props> = ({user, workspaces, userWorkspaces, addWorkspace, removeWorkspace}) => {
     const [checked, setChecked] = React.useState<number[]>([]);
     const [unChecked, setUnChecked] = React.useState<number[]>([]);
+    const [initialLoad, setInitialLoad] = React.useState<boolean>(true);
+
+    useEffect(() => {
+      console.log('useEffect() fired in UserGroups.tsx');
+      loadChecked();
+    }, [userWorkspaces]);
 
     const loadChecked = () => {
-        userWorkspaces.map(x => checked.push(x.workspaceId));
+      console.log('Inside loadChecked');
+   //   if (initialLoad) {
+        console.log('initialLoad is true');
+        let newChecked = [...checked];
+        userWorkspaces.map(x => {
+          console.log(`Inside userWorkspaces.map with a value of x being ${x}`);
+          newChecked.push(x.workspaceId)
+        });
+        setChecked(newChecked);
+        setInitialLoad(false);
+ //     }
     };
 
     const handleToggle = (value: number) => () => {
@@ -53,14 +69,16 @@ export const UserGroups: FC<Props> = ({user, workspaces, userWorkspaces, addWork
         console.log(`Unchecked - ${unChecked}`);
       };
 
-    loadChecked();
-
       return (
           <div>
         <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
           {workspaces.map((value) => {
+            console.log(`Inside workspaces.map with a value of ${value.id}`);
             let setChecked: boolean = false;
+            console.log(`Prior to the call of checked.indexOf and it has a length of ${checked.length}`);
             const checkedIndex = checked.indexOf(value.id);
+            console.log(`The value of checkedIndex is ${checkedIndex}`);
+            checked.map(i => console.log(`Inside checked.map with a value of ${i}`));
             if (checkedIndex !== -1) {
                 setChecked = true;
             }

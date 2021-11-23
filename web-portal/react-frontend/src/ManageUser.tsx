@@ -50,19 +50,25 @@ export const ManageUser = ({ID}: Props) => {
             setWorkspaces(workspaces);
         }
 
-        const doGetUserWorkspaces = async() => {
+        const doGetUserWorkspaces = async(id: number) => {
+          console.log(`Inside doGetUserWorkspaces with an id value of ${id}`);
           const accessToken = await getAccessTokenSilently();
           const userWorkspaces = await getWorkspacesForUser(accessToken, id);
+          console.log(`Returned from call to getWorkspacesForUser with a length of ${userWorkspaces.length}`);
+          console.log(`The total value of userWorkspaces is ${userWorkspaces}`);
+          userWorkspaces.map(x => console.log(`Inside userWorkspaces.map with a workspaceid od ${x.workspaceId}`));
           setUserWorkspaces(userWorkspaces);
         };
 
         const doGetUser = async(id: number) => {
+            console.log(`Inside doGetUser with an id value of ${id}`);
             const accessToken = await getAccessTokenSilently();
             const user = await getUser(accessToken, id);
             
             if (user !== undefined) {
               console.log('retrieved the user from the backend');
               setId(id);
+              console.log(`called setId with an id of ${id}`);
               setUserId(user.userId);
               setLastName(user.lastName);
               setFirstName(user.firstName);
@@ -74,9 +80,10 @@ export const ManageUser = ({ID}: Props) => {
         };
 
         if (isAuthenticated) {
+            console.log(`isAuthenticated has passed and the value of ID is ${ID}`);
             doGetUser(ID);
             doGetWorkspaces();
-            doGetUserWorkspaces(); 
+            doGetUserWorkspaces(ID); 
         }
     }, [isAuthenticated]);
 
@@ -93,6 +100,7 @@ export const ManageUser = ({ID}: Props) => {
     };
 
     const updateUserGroups = async () => {
+      console.log(`Inside updateUserGroups`);
       const accessToken = await getAccessTokenSilently();
       const uow: UnitOfWork<number> = {
         adds: addedWorkgroups,
@@ -100,8 +108,10 @@ export const ManageUser = ({ID}: Props) => {
       };
 
       const processorResults = await processUserWorkspaceUpdates(accessToken, id, uow);
-      if (processorResults.isSuccessful) {
+      if (!processorResults.isSuccessful) {
         console.log(`The call to processUserWorkspaceUpdates was unsuccessful with an error message of ${processorResults.errorMessage}`);
+      } else {
+        console.log('The call to processUserWorkspaceUpdates was successful.');
       }
     };
 
@@ -178,15 +188,9 @@ export const ManageUser = ({ID}: Props) => {
                 label="First Name" variant="outlined" value={firstName}/>
             <TextField id="email" onChange={(event) => setEmail(event.target.value)} 
                 label="Email" variant="outlined" value={email}  />
-          </Box>
-    {/*    <Box>
-            Workspaces
-            <WorkspaceGrid data={workspaces || []} />
-    </Box> */}
-          
+          </Box>          
           <div>{firstName}'s Workspaces</div>
           <div>
-       {/*     <WorkspaceGrid data={ assembleWorkspacesForUser() } /> */}
             <UserGroups 
               user={assembleUser()} 
               workspaces={workspaces} 
@@ -194,7 +198,6 @@ export const ManageUser = ({ID}: Props) => {
               addWorkspace={(id) => handleAddWorkspace(id)} 
               removeWorkspace={(id) => handleRemoveWorkspace(id)}></UserGroups>
           </div>
-          
           <Button variant="contained" onClick={ () => { updateUser(); } }>Submit</Button>
       </div>
     );

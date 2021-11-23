@@ -108,17 +108,20 @@ public class UserController {
         return getWorkspacesForUser(userId);
     }
 
-    @DeleteMapping("{userId/workspaces/{workspaceId}")
+    @DeleteMapping("{userId}/workspaces/{workspaceId}")
     public Iterable<PbiWorkspaceUser> deleteWorkspaceForUser(
             @PathVariable Long userId,
             @PathVariable Long workspaceId) {
 
+        logger.info("Inside deleteWorkspaceForUser with a userId of " + userId + " and a workspaceId of " + workspaceId);
         List<PbiWorkspaceUser> workspaceUsers =
                 pbiWorkspaceUserRepository
                         .findAll()
                         .stream()
                         .filter(workspaceUser -> workspaceUser.getUserId() == userId && workspaceUser.getWorkspaceId() == workspaceId)
                         .collect(Collectors.toList());
+
+        logger.info("The returned workspaceUsers has a length of " + workspaceUsers.size());
 
         if (workspaceUsers.size() == 0) {
             throw new InvalidDataAccessApiUsageException("There were no WorkspaceUser resources with a userId of "

@@ -8,12 +8,14 @@ export const processUserWorkspaceUpdates = async (
     userId: number, 
     userGroups: UnitOfWork<number>): Promise<ProcessorResult> => {
 
+    console.log(`Inside processUserWorkspaceUpdates with countAdds: ${userGroups.adds.length} and countDeletes: ${userGroups.deletes.length}`);
     let processorResult: ProcessorResult = {
         isSuccessful: true
     };
 
     for (var i of userGroups.deletes) {
         const innerResult = await deleteWorkspaceUser(accessToken, userId, i);
+        console.log(`Reuturned from deleteWorkspaceUser with a value of ${innerResult.successful}`);
         if (!innerResult.successful) {
             processorResult.isSuccessful = false;
         }
@@ -25,8 +27,9 @@ export const processUserWorkspaceUpdates = async (
             userId: userId,
             workspaceId: j
         };
-        const innerResult = await postWorkspaceUser(accessToken, workspaceUser);
-        if (innerResult === undefined) {
+        const postedUser = await postWorkspaceUser(accessToken, workspaceUser);
+        console.log(`Reuturned from postWorkspaceUser with a value of ${postedUser?.id}`);
+        if (postedUser === undefined) {
             processorResult.isSuccessful = false;
         }
     }
