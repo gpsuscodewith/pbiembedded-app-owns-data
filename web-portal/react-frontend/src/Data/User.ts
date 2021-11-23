@@ -24,6 +24,18 @@ const mapUserDataFromServer = (
     ...user
 });
 
+export const getMe = async(accessToken: string): Promise<UserData | undefined> => {
+    console.log(`Inside getMe with an accessToken of ${accessToken}`);
+    const result = await http<UserDataFromServer>({
+        path: `/me`,
+        accessToken: accessToken
+    });
+    if (result.ok && result.body) {
+        return mapUserDataFromServer(result.body);
+    } else {
+        return undefined;
+    }
+};
 
 export const getUsers = async(accessToken: string): Promise<UserData[]> => {
     const result = await http<UserDataFromServer[]>({
