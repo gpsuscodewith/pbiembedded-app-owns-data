@@ -43,6 +43,19 @@ public class PbiWorkspaceUserController {
                 .collect(Collectors.toList());
     }
 
+    @DeleteMapping("{/userWorkspaceId}")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean deletePbiWorkspaceUser(@PathVariable Long userWorkspaceId) {
+        logger.info("Inside deletePbiWorkspaceUser with a value of " + userWorkspaceId);
+        PbiWorkspaceUser workspaceUser = pbiWorkspaceUserRepository.getById(userWorkspaceId);
+        if (workspaceUser != null) {
+            pbiWorkspaceUserRepository.delete(workspaceUser);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PbiWorkspaceUser createPbiWorkspaceUser(@RequestBody PbiWorkspaceUser pbiWorkspaceUser) {

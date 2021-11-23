@@ -1,33 +1,35 @@
 import { ProcessorResult, UnitOfWork } from "./UnitOfWork";
 import { UserData,putUser } from "./User";
-import { deleteWorkspaceUser, postWorkspaceForUser } from "./WorkspaceUser";
+import { WorkspaceData } from "./Workspace";
+import { deleteWorkspaceUser, postWorkspaceUser, WorkspaceUserData } from "./WorkspaceUser";
 
-
-export const UserProcessor = async (
+export const processUserWorkspaceUpdates = async (
     accessToken: string,
-    user: UserData, 
+    userId: number, 
     userGroups: UnitOfWork<number>): Promise<ProcessorResult> => {
 
+    console.log(`Inside processUserWorkspaceUpdates with countAdds: ${userGroups.adds.length} and countDeletes: ${userGroups.deletes.length}`);
     let processorResult: ProcessorResult = {
         isSuccessful: true
     };
 
-    const result = await putUser(accessToken, user);
-    if (result === undefined) {
-        processorResult.errorMessage = "There was a failure updated the user resource";
-        return processorResult;
-    }
-
     for (var i of userGroups.deletes) {
-        const innerResult = await deleteWorkspaceUser(accessToken, user.id, i);
+        const innerResult = await deleteWorkspaceUser(accessToken, userId, i);
+        console.log(`Reuturned from deleteWorkspaceUser with a value of ${innerResult.successful}`);
         if (!innerResult.successful) {
             processorResult.isSuccessful = false;
         }
     }
 
     for (var j of userGroups.adds) {
-        const innerResult = await postWorkspaceForUser(accessToken, user.id, j);
-        if (!innerResult.successful) {
+        const workspaceUser: WorkspaceUserData = {
+            id: 0,
+            userId: userId,
+            workspaceId: j
+        };
+        const postedUser = await postWorkspaceUser(accessToken, workspaceUser);
+        console.log(`Reuturned from postWorkspaceUser with a value of ${postedUser?.id}`);
+        if (postedUser === undefined) {
             processorResult.isSuccessful = false;
         }
     }
