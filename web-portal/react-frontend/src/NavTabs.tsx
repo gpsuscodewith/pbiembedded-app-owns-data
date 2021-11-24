@@ -6,7 +6,7 @@ import Tab from '@mui/material/Tab';
 import { UsersPage } from './UsersPage';
 import { TenantsPage } from './TenantsPage';
 import { WorkspacePage } from './WorkspacePage';
-import { DatasetsPage } from './DatasetsPage';
+import { DatasetsPage  } from './DatasetsPage';
 
 interface TabPanelProps {
     children?: React.ReactNode;
