@@ -722,10 +722,6 @@ public class PowerBiService {
         // HTTP entity object - holds header and body
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         ResponseEntity resp = restTemplate.exchange(uri, HttpMethod.DELETE, httpEntity, String.class);
-      //  Map<String, String> params = new HashMap<String, String>();
-     //   params.put("dataSetId", datasetId);
-    //    restTemplate.delete(uri, params);
-        int x = 0;
     }
 
     public static String addUserToGroup(String accessToken, String groupId, String emailAddress, String groupUserAccessRights) throws JSONException {

@@ -4,6 +4,7 @@ package com.gpsuscodewith.powerbiembedded.appownsdata.web;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gpsuscodewith.powerbiembedded.appownsdata.config.Config;
 import com.gpsuscodewith.powerbiembedded.appownsdata.domain.*;
+import com.gpsuscodewith.powerbiembedded.appownsdata.powerbi.commands.DeleteDatasetCommand;
 import com.gpsuscodewith.powerbiembedded.appownsdata.repositories.DatasetRepository;
 //import org.simpleframework.xml.Path;
 import com.gpsuscodewith.powerbiembedded.appownsdata.repositories.PbiWorkspaceRepository;
@@ -151,7 +152,11 @@ public class DatasetsController {
             String pbiId = dataset.getPbiId();
             String groupId = getPbiWorkspaceIdForDataset(dataset);
             logger.info("Inside deleteDataset with a pbiId of " + pbiId + " and a workspace of " + groupId);
-            PowerBiService.deleteDataset(accessToken, groupId, pbiId);
+
+            DeleteDatasetCommand cmd = new DeleteDatasetCommand(accessToken, groupId, pbiId);
+            cmd.execute();
+
+         //   PowerBiService.deleteDataset(accessToken, groupId, pbiId);
             datasetRepository.deleteById(id);
         } catch (Exception e) {
             logger.error(e.getMessage());
