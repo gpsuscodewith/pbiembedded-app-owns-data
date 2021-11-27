@@ -12,6 +12,7 @@ import com.gpsuscodewith.powerbiembedded.appownsdata.services.PowerBiService;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -119,6 +120,7 @@ public class DatasetsController {
         }
 
         // call get report in group and grab dataset id from response
+        logger.info("Inside createDataset and setting the PbiId to be " + datasetPbiId);
         dataset.setPbiId(datasetPbiId);
         dataset.setWebUrl(result.getWebUrl());
         dataset.setPbiWorkspaceId(pbiWorkspaceId);
@@ -140,8 +142,32 @@ public class DatasetsController {
 
     @DeleteMapping("{id}")
     public ResponseEntity deleteDataset(@PathVariable Long id, Principal principal) {
-        datasetRepository.deleteById(id);
+        Dataset dataset =  datasetRepository.findById(id).orElseThrow(RuntimeException::new);
+
+        // Get access token
+        String accessToken;
+        try {
+            accessToken = AzureADService.getAccessToken();
+            String pbiId = dataset.getPbiId();
+            String groupId = getPbiWorkspaceIdForDataset(dataset);
+            logger.info("Inside deleteDataset with a pbiId of " + pbiId + " and a workspace of " + groupId);
+            PowerBiService.deleteDataset(accessToken, groupId, pbiId);
+            datasetRepository.deleteById(id);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+
         return ResponseEntity.ok().build();
     }
 
+    private String getPbiWorkspaceIdForDataset(Dataset dataset) {
+        PbiWorkspace workspace = workspaceRepository.findById(dataset.getWorkspaceId()).get();
+        if (workspace == null) {
+            throw new InvalidDataAccessApiUsageException("There was no Workspace Id found for the Dataset with id of " + dataset.getId());
+        }
+
+        return workspace.getPbiIdentifier();
+    }
 }

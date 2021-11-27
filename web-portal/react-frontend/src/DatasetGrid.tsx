@@ -8,10 +8,10 @@ import { Link } from "@material-ui/core";
 
 interface Props {
     data: DatasetData[];
-    onManageDataset?: (id: number) => void;
+    onDeleteDataset?: (id: number) => void;
 }
 
-export const DatasetGrid: FC<Props> = ({data, onManageDataset}) => {
+export const DatasetGrid: FC<Props> = ({data, onDeleteDataset}) => {
     const [selectionModel, setSelectionModel] = React.useState<GridSelectionModel>([]);
     
     const columns: GridColDef[] = [
@@ -85,13 +85,13 @@ export const DatasetGrid: FC<Props> = ({data, onManageDataset}) => {
                     const id: string = thisRow['id'] != null ? thisRow['id'].toString() : '';
                     if (id.length > 0) {
                         console.log(`The value of the id for the dataset is ${id}`);
-                        if (onManageDataset !== undefined) {
-                            onManageDataset(parseInt(id));
+                        if (onDeleteDataset !== undefined) {
+                            onDeleteDataset(parseInt(id));
                         }
                     }
                 };
     
-                return <Link onClick={onClick} underline="always">Manage</Link>;
+                return <Link onClick={onClick} underline="always">Delete</Link>;
             }
         }
     ];

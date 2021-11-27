@@ -6,16 +6,17 @@ import { getUsers, UserData } from "./Data/User";
 import { styled } from '@mui/material/styles';
 import { UserList } from "./UsersList";
 import { Button } from '@mui/material';
-import { UserGrid } from './UsersGrid';
+import { DatasetGrid } from './DatasetGrid';
 import { BootstrapButton } from './BootstrapButton';
-import { DatasetData, getDatasets } from './Data/Dataset';
+import { DatasetData, getDatasets, deleteDataset } from './Data/Dataset';
 import { NewDataset } from './NewDataset';
 
 export const DatasetsPage = () => {
     const [datasets, setDatasets] = useState<DatasetData[]>([]);
     const [datasetsLoading, setDatasetsLoading] = useState<boolean>(true);
-    const [creatingNewDataset, setCreatingNewDataset] = useState<boolean>(true);
-
+    const [creatingNewDataset, setCreatingNewDataset] = useState<boolean>(false);
+    const [managedDatasetId, setManagedDatasetId] = useState(0);
+    const [managingDataset, setManagingDataset] = useState(false);
     const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
     useEffect(() => {
@@ -30,7 +31,7 @@ export const DatasetsPage = () => {
         } else {
             console.log('The value of isAuthenticated is ' + isAuthenticated);
         }
-    }, [isAuthenticated, creatingNewDataset]);
+    }, [isAuthenticated, creatingNewDataset, managingDataset, managedDatasetId]);
 
     const addDataset = () => {
         setCreatingNewDataset(true);
@@ -38,6 +39,15 @@ export const DatasetsPage = () => {
 
     const datasetAdded = (dataset: DatasetData) => {
         setCreatingNewDataset(false);
+    };
+
+    const handleDeleteDataset = async (id: number) => {
+        const accessToken = await getAccessTokenSilently();
+        const result = await deleteDataset(accessToken, id);
+        if (!result.successful) {
+            console.log('The call to deleteDataset failed');
+        }
+        setManagedDatasetId(id);
     };
 
     return (
@@ -53,8 +63,9 @@ export const DatasetsPage = () => {
               </div>
             ) : creatingNewDataset ? (
                 <NewDataset />
-            ) : (
+            ) :  (
                 <div>
+                    <DatasetGrid data={datasets || []} onDeleteDataset={(id:number) => handleDeleteDataset(id)} />
                     <div>
                         <BootstrapButton variant="contained" color="primary" onClick={ () => { addDataset(); } }>Add Dataset</BootstrapButton>
                     </div>

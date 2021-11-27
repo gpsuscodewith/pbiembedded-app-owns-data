@@ -25,6 +25,20 @@ export interface DatasetDataFromServer {
     webUrl?: string;
 }
 
+export interface DatasetDeleteResult {
+    successful: boolean;
+}
+
+export interface DatasetDeleteResultFromServer {
+    successful: boolean;
+}
+
+const mapDatasetDeleteResultFromServer = (
+    datasetDeleteResult: DatasetDeleteResultFromServer
+) : DatasetDeleteResult => ({
+    ...datasetDeleteResult
+});
+
 const mapDatasetDataFromServer = (
     dataset: DatasetDataFromServer,
 ) : DatasetData => ({
@@ -57,5 +71,21 @@ export const postDataset = async(accessToken: string, dataset: DatasetData): Pro
         return mapDatasetDataFromServer(result.body);
     } else {
         return undefined;
+    }
+};
+
+export const deleteDataset = async(accessToken: string, id: number): Promise<DatasetDeleteResult> => {
+    console.log('Inside deleteDataset with an accessToken of ' + accessToken);
+    const result = await http<DatasetDeleteResultFromServer>({
+        path: `/datasets/${id}`,
+        method: 'DELETE',
+        accessToken: accessToken
+    });
+    if (result.ok && result.body) {
+        return mapDatasetDeleteResultFromServer(result.body);
+    } else {
+        return {
+            successful: false
+        };
     }
 };

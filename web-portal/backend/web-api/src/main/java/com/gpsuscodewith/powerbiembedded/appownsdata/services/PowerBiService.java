@@ -12,13 +12,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.http.Header;
@@ -710,6 +709,23 @@ public class PowerBiService {
         GroupConfig group = mapper.readValue(responseBody, GroupConfig.class);
 
         return group;
+    }
+
+    public static void deleteDataset(String accessToken, String groupId, String datasetId) throws JSONException, URISyntaxException {
+        final String uri = "https://api.powerbi.com/v1.0/myorg/groups/" + groupId + "/datasets/" + datasetId;
+
+        logger.info("Inside PowerBIService.deleteDataset with a datasetId of " + datasetId);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Content-Type", Arrays.asList("application/json"));
+        headers.put("Authorization", Arrays.asList("Bearer " + accessToken));
+        // HTTP entity object - holds header and body
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        ResponseEntity resp = restTemplate.exchange(uri, HttpMethod.DELETE, httpEntity, String.class);
+      //  Map<String, String> params = new HashMap<String, String>();
+     //   params.put("dataSetId", datasetId);
+    //    restTemplate.delete(uri, params);
+        int x = 0;
     }
 
     public static String addUserToGroup(String accessToken, String groupId, String emailAddress, String groupUserAccessRights) throws JSONException {
