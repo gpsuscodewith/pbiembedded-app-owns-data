@@ -156,6 +156,8 @@ public class DatasetsController {
             DeleteDatasetCommand cmd = new DeleteDatasetCommand(accessToken, groupId, pbiId);
             cmd.execute();
 
+
+
          //   PowerBiService.deleteDataset(accessToken, groupId, pbiId);
             datasetRepository.deleteById(id);
         } catch (Exception e) {

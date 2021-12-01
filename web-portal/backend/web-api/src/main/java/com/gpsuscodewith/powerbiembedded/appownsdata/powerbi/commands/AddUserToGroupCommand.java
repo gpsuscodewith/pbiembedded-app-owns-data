@@ -1,5 +1,4 @@
 package com.gpsuscodewith.powerbiembedded.appownsdata.powerbi.commands;
 
-public class PowerBiRestCommand {
-
+public class AddUserToGroupCommand {
 }
