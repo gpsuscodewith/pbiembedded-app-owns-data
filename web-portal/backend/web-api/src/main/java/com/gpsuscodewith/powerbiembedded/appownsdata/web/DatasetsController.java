@@ -2,9 +2,12 @@ package com.gpsuscodewith.powerbiembedded.appownsdata.web;
 
 //import com.azure.core.annotation.Delete;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gpsuscodewith.powerbiembedded.appownsdata.aggregators.DatasetAggregate;
 import com.gpsuscodewith.powerbiembedded.appownsdata.config.Config;
 import com.gpsuscodewith.powerbiembedded.appownsdata.domain.*;
-import com.gpsuscodewith.powerbiembedded.appownsdata.powerbi.commands.DeleteDatasetCommand;
+import com.gpsuscodewith.powerbiembedded.appownsdata.commands.DeleteDatasetCommand;
+import com.gpsuscodewith.powerbiembedded.appownsdata.projections.DatasetProjection;
+import com.gpsuscodewith.powerbiembedded.appownsdata.queries.DatasetByIdQuery;
 import com.gpsuscodewith.powerbiembedded.appownsdata.repositories.DatasetRepository;
 //import org.simpleframework.xml.Path;
 import com.gpsuscodewith.powerbiembedded.appownsdata.repositories.PbiWorkspaceRepository;
@@ -18,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -25,7 +29,6 @@ import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @CrossOrigin(maxAge = 3600)
@@ -143,23 +146,19 @@ public class DatasetsController {
 
     @DeleteMapping("{id}")
     public ResponseEntity deleteDataset(@PathVariable Long id, Principal principal) {
-        Dataset dataset =  datasetRepository.findById(id).orElseThrow(RuntimeException::new);
-
-        // Get access token
-        String accessToken;
+         
         try {
-            accessToken = AzureADService.getAccessToken();
+            Dataset dataset =  new DatasetProjection(datasetRepository)
+                    .handle(new DatasetByIdQuery(id));
+
+            String accessToken = AzureADService.getAccessToken();
             String pbiId = dataset.getPbiId();
             String groupId = getPbiWorkspaceIdForDataset(dataset);
             logger.info("Inside deleteDataset with a pbiId of " + pbiId + " and a workspace of " + groupId);
 
-            DeleteDatasetCommand cmd = new DeleteDatasetCommand(accessToken, groupId, pbiId);
-            cmd.execute();
-
-
-
-         //   PowerBiService.deleteDataset(accessToken, groupId, pbiId);
-            datasetRepository.deleteById(id);
+            DeleteDatasetCommand cmd = new DeleteDatasetCommand(accessToken, id, groupId, pbiId);
+            DatasetAggregate aggregate = new DatasetAggregate(datasetRepository);
+            aggregate.handle(cmd);
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();

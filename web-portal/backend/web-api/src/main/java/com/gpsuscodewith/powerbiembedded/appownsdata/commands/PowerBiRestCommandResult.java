@@ -1,4 +1,4 @@
-package com.gpsuscodewith.powerbiembedded.appownsdata.powerbi.commands;
+package com.gpsuscodewith.powerbiembedded.appownsdata.commands;
 
 public class PowerBiRestCommandResult<T> {
     private boolean isSuccessful;
