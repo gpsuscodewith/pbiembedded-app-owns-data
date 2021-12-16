@@ -7,7 +7,9 @@ import com.gpsuscodewith.powerbiembedded.appownsdata.config.Config;
 import com.gpsuscodewith.powerbiembedded.appownsdata.domain.*;
 import com.gpsuscodewith.powerbiembedded.appownsdata.commands.DeleteDatasetCommand;
 import com.gpsuscodewith.powerbiembedded.appownsdata.projections.DatasetProjection;
+import com.gpsuscodewith.powerbiembedded.appownsdata.projections.WorkspaceProjection;
 import com.gpsuscodewith.powerbiembedded.appownsdata.queries.DatasetByIdQuery;
+import com.gpsuscodewith.powerbiembedded.appownsdata.queries.WorkspaceByIdQuery;
 import com.gpsuscodewith.powerbiembedded.appownsdata.repositories.DatasetRepository;
 //import org.simpleframework.xml.Path;
 import com.gpsuscodewith.powerbiembedded.appownsdata.repositories.PbiWorkspaceRepository;
@@ -146,7 +148,7 @@ public class DatasetsController {
 
     @DeleteMapping("{id}")
     public ResponseEntity deleteDataset(@PathVariable Long id, Principal principal) {
-         
+
         try {
             Dataset dataset =  new DatasetProjection(datasetRepository)
                     .handle(new DatasetByIdQuery(id));
@@ -169,7 +171,9 @@ public class DatasetsController {
     }
 
     private String getPbiWorkspaceIdForDataset(Dataset dataset) {
-        PbiWorkspace workspace = workspaceRepository.findById(dataset.getWorkspaceId()).get();
+        PbiWorkspace workspace = new WorkspaceProjection(workspaceRepository)
+                .handle(new WorkspaceByIdQuery(dataset.getWorkspaceId()));
+       // PbiWorkspace workspace = workspaceRepository.findById(dataset.getWorkspaceId()).get();
         if (workspace == null) {
             throw new InvalidDataAccessApiUsageException("There was no Workspace Id found for the Dataset with id of " + dataset.getId());
         }
