@@ -2,8 +2,14 @@ package com.gpsuscodewith.powerbiembedded.appownsdata.web;
 
 //import com.azure.core.annotation.Delete;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.gpsuscodewith.powerbiembedded.appownsdata.aggregators.DatasetAggregate;
 import com.gpsuscodewith.powerbiembedded.appownsdata.config.Config;
 import com.gpsuscodewith.powerbiembedded.appownsdata.domain.*;
+import com.gpsuscodewith.powerbiembedded.appownsdata.commands.DeleteDatasetCommand;
+import com.gpsuscodewith.powerbiembedded.appownsdata.projections.DatasetProjection;
+import com.gpsuscodewith.powerbiembedded.appownsdata.projections.WorkspaceProjection;
+import com.gpsuscodewith.powerbiembedded.appownsdata.queries.DatasetByIdQuery;
+import com.gpsuscodewith.powerbiembedded.appownsdata.queries.WorkspaceByIdQuery;
 import com.gpsuscodewith.powerbiembedded.appownsdata.repositories.DatasetRepository;
 //import org.simpleframework.xml.Path;
 import com.gpsuscodewith.powerbiembedded.appownsdata.repositories.PbiWorkspaceRepository;
@@ -12,10 +18,12 @@ import com.gpsuscodewith.powerbiembedded.appownsdata.services.PowerBiService;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -23,7 +31,6 @@ import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @CrossOrigin(maxAge = 3600)
@@ -119,6 +126,7 @@ public class DatasetsController {
         }
 
         // call get report in group and grab dataset id from response
+        logger.info("Inside createDataset and setting the PbiId to be " + datasetPbiId);
         dataset.setPbiId(datasetPbiId);
         dataset.setWebUrl(result.getWebUrl());
         dataset.setPbiWorkspaceId(pbiWorkspaceId);
@@ -140,8 +148,36 @@ public class DatasetsController {
 
     @DeleteMapping("{id}")
     public ResponseEntity deleteDataset(@PathVariable Long id, Principal principal) {
-        datasetRepository.deleteById(id);
+
+        try {
+            Dataset dataset =  new DatasetProjection(datasetRepository)
+                    .handle(new DatasetByIdQuery(id));
+
+            String accessToken = AzureADService.getAccessToken();
+            String pbiId = dataset.getPbiId();
+            String groupId = getPbiWorkspaceIdForDataset(dataset);
+            logger.info("Inside deleteDataset with a pbiId of " + pbiId + " and a workspace of " + groupId);
+
+            DeleteDatasetCommand cmd = new DeleteDatasetCommand(accessToken, id, groupId, pbiId);
+            DatasetAggregate aggregate = new DatasetAggregate(datasetRepository);
+            aggregate.handle(cmd);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+
         return ResponseEntity.ok().build();
     }
 
+    private String getPbiWorkspaceIdForDataset(Dataset dataset) {
+        PbiWorkspace workspace = new WorkspaceProjection(workspaceRepository)
+                .handle(new WorkspaceByIdQuery(dataset.getWorkspaceId()));
+       // PbiWorkspace workspace = workspaceRepository.findById(dataset.getWorkspaceId()).get();
+        if (workspace == null) {
+            throw new InvalidDataAccessApiUsageException("There was no Workspace Id found for the Dataset with id of " + dataset.getId());
+        }
+
+        return workspace.getPbiIdentifier();
+    }
 }

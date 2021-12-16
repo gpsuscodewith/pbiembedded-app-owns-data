@@ -102,7 +102,7 @@ export const NewWorkspaceForm = ({workspaceCreated}: Props) => {
           </Select>
           <TextField id="workspaceName" onChange={(event) => setWorkspaceName(event.target.value)} label="Workspace Name" variant="outlined" />
           <TextField id="workspaceLocation" onChange={(event) => setWorkspaceLocation(event.target.value)} label="Workspace Location" variant="outlined" />
-          <TextField id="pbiIdentifier" onChange={(event) => setPbiIdentifier(event.target.value)} label="Power Bi Identifier" variant="outlined" />
+          
           <Button variant="contained" onClick={ () => { createWorkspace(); } }>Submit</Button>
         </Box>
         );
