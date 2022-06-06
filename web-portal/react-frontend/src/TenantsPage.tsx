@@ -26,7 +26,7 @@ export const TenantsPage = () => {
         } else {
             console.log(`The value of isAuthenticated in TenantsPage useEffect() is ${isAuthenticated}`);
         }
-    }, [isAuthenticated, creatingNewTenant]);
+    }, [isAuthenticated, creatingNewTenant, getAccessTokenSilently]);
 
     const addTenant = () => {
         setCreatingNewtenant(true);
